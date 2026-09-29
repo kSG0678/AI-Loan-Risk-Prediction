@@ -52,7 +52,22 @@ def create_database_engine(
     **engine_options: Any,
 ) -> Engine:
     """Create a SQLAlchemy engine; connecting remains lazy until first use."""
-    return create_engine(get_database_url(environ), pool_pre_ping=True, **engine_options)
+    settings = os.environ if environ is None else environ
+    connect_args = dict(engine_options.pop("connect_args", {}))
+    ca_path = settings.get("DB_SSL_CA")
+    if ca_path:
+        if not Path(ca_path).is_file():
+            raise ValueError("DB_SSL_CA must point to an existing CA certificate file.")
+        connect_args.update(
+            ssl_ca=ca_path,
+            ssl_verify_cert=True,
+            ssl_verify_identity=True,
+        )
+    if connect_args:
+        engine_options["connect_args"] = connect_args
+    return create_engine(
+        get_database_url(environ), pool_pre_ping=True, **engine_options
+    )
 
 
 def create_session_factory(engine: Engine) -> sessionmaker[Session]:

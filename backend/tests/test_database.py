@@ -2,7 +2,10 @@
 
 from decimal import Decimal
 import secrets
+from tempfile import TemporaryDirectory
 from unittest import TestCase
+from unittest.mock import patch
+from pathlib import Path
 
 from sqlalchemy import create_engine, event, inspect
 from sqlalchemy.exc import IntegrityError
@@ -14,6 +17,7 @@ from backend.database.config import (
     get_database_url,
 )
 from backend.models import Base, LoanApplication, Prediction
+from backend.utils.config import DEVELOPMENT_ORIGINS, get_allowed_origins
 
 
 VALID_DB_ENV = {
@@ -57,6 +61,45 @@ class DatabaseConfigurationTests(TestCase):
             self.assertEqual(engine.url.drivername, "mysql+pymysql")
         finally:
             engine.dispose()
+
+    def test_ssl_ca_must_be_a_readable_file(self) -> None:
+        with self.assertRaisesRegex(ValueError, "DB_SSL_CA"):
+            create_database_engine(
+                {**VALID_DB_ENV, "DB_SSL_CA": "missing-ca-certificate.pem"}
+            )
+
+    def test_ssl_ca_enables_certificate_and_identity_verification(self) -> None:
+        with TemporaryDirectory() as directory:
+            ca_path = Path(directory) / "mysql-ca.pem"
+            ca_path.write_text("test CA placeholder", encoding="utf-8")
+            with patch("backend.database.config.create_engine") as create_engine:
+                create_database_engine(
+                    {**VALID_DB_ENV, "DB_SSL_CA": str(ca_path)}
+                )
+
+        connect_args = create_engine.call_args.kwargs["connect_args"]
+        self.assertEqual(connect_args["ssl_ca"], str(ca_path))
+        self.assertTrue(connect_args["ssl_verify_cert"])
+        self.assertTrue(connect_args["ssl_verify_identity"])
+
+
+class CorsConfigurationTests(TestCase):
+    def test_default_origins_are_local_development_origins(self) -> None:
+        self.assertEqual(get_allowed_origins({}), DEVELOPMENT_ORIGINS)
+
+    def test_configured_origins_are_parsed_and_normalized(self) -> None:
+        self.assertEqual(
+            get_allowed_origins(
+                {"CORS_ORIGINS": "https://loan.example, https://www.loan.example/"}
+            ),
+            ("https://loan.example", "https://www.loan.example"),
+        )
+
+    def test_wildcard_or_invalid_origins_are_rejected(self) -> None:
+        for origins in ("*", "https://example.com/path", "ftp://example.com"):
+            with self.subTest(origins=origins):
+                with self.assertRaisesRegex(ValueError, "CORS_ORIGINS"):
+                    get_allowed_origins({"CORS_ORIGINS": origins})
 
 
 class DatabaseModelTests(TestCase):

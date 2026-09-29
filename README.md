@@ -84,6 +84,14 @@ The request and response examples, database setup, and endpoint details are in
 history at `/history`; its setup and behavior are described in
 [`frontend/README.md`](frontend/README.md).
 
+## Deployment
+
+The recommended portfolio deployment uses Vercel for the static frontend,
+Render for FastAPI, and managed Aiven MySQL. Provider configuration and the
+required production environment variables are documented in
+[`deployment/README.md`](deployment/README.md). Deployment is a manual,
+credential-controlled operation; no external service is configured here.
+
 ## Verification
 
 Run the backend API, database, and ML prediction tests from the project root:
