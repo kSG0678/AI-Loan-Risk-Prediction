@@ -16,8 +16,8 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=list(get_allowed_origins()),
     allow_credentials=False,
-    allow_methods=["GET", "POST"],
-    allow_headers=["Content-Type"],
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 register_exception_handlers(app)
