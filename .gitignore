@@ -34,3 +34,5 @@ ml/reports/**/*.png
 .ipynb_checkpoints/
 .DS_Store
 Thumbs.db
+
+certs/
