@@ -3,6 +3,10 @@
 An educational full-stack project for exploring loan risk prediction with a
 saved scikit-learn pipeline, FastAPI, MySQL, and a React frontend.
 
+## 🚀 Live Demo
+
+[Open AI Loan Risk Prediction](https://ai-loan-risk-frontend.onrender.com)
+
 ## Project status
 
 The model inference pipeline, prediction API, transactional MySQL persistence,
