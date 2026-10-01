@@ -14,6 +14,9 @@ function FieldControl({ field, value, onChange }) {
           onChange={onChange}
           required
         >
+          <option value="" disabled>
+            Select {field.label}
+          </option>
           {field.options.map((option) => {
             const item =
               typeof option === "string"

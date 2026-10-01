@@ -1,15 +1,15 @@
 export const INITIAL_APPLICANT = {
-  Gender: "Male",
-  Married: "Yes",
-  Dependents: "1",
-  Education: "Graduate",
-  Self_Employed: "No",
-  ApplicantIncome: "4583",
-  CoapplicantIncome: "1508",
-  LoanAmount: "128",
-  Loan_Amount_Term: "360",
-  Credit_History: "1",
-  Property_Area: "Semiurban",
+  Gender: "",
+  Married: "",
+  Dependents: "",
+  Education: "",
+  Self_Employed: "",
+  ApplicantIncome: "",
+  CoapplicantIncome: "",
+  LoanAmount: "",
+  Loan_Amount_Term: "",
+  Credit_History: "",
+  Property_Area: "",
 };
 
 export const APPLICANT_FIELDS = [
